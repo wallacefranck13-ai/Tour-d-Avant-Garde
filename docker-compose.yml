@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - '3050:3050'
+    environment:
+      PORT: 3050
+      # Base de données : sqljs par défaut (aucune config requise). Pour
+      # basculer vers le service postgres ci-dessous, décommenter ce bloc et
+      # le service "postgres", puis relancer `docker compose up --build`.
+      DB_DRIVER: ${DB_DRIVER:-sqljs}
+      DB_PATH: /app/data/tag.sqlite
+      # DATABASE_URL: postgres://tag:change-me@postgres:5432/tag
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN:-}
+      WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN:-}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_PUBLIC_URL_BASE: ${S3_PUBLIC_URL_BASE:-}
+    volumes:
+      - backend-data:/app/data
+      - backend-uploads:/app/uploads
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '4300:4300'
+    depends_on:
+      - backend
+
+  # PostgreSQL — décommenter ce service + DATABASE_URL ci-dessus, et passer
+  # DB_DRIVER=postgres (variable d'environnement du host, ex: `DB_DRIVER=postgres
+  # docker compose up`) quand une instance sera disponible. Aucun changement
+  # de code requis, uniquement ces variables.
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_USER: tag
+  #     POSTGRES_PASSWORD: change-me
+  #     POSTGRES_DB: tag
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  backend-data:
+  backend-uploads:
+  # postgres-data:
