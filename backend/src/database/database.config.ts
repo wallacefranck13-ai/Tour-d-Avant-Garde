@@ -35,5 +35,11 @@ export function getDatabaseConnectionOptions(): Record<string, unknown> {
     type: 'sqljs',
     location: process.env.DB_PATH || './data/tag.sqlite',
     autoSave: true,
+    // Passé explicitement : sur certains runners CI (Linux), le
+    // `require('sql.js')` interne de TypeORM (via PlatformTools.load) résout
+    // un module non appelable et fait échouer toute connexion avec
+    // "this.sqlite is not a function". Fournir directement le module ici
+    // contourne ce chemin de chargement.
+    driver: require('sql.js'),
   };
 }
