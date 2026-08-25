@@ -3,7 +3,8 @@ import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import request from 'supertest';
-import { existsSync, unlinkSync } from 'fs';
+import { existsSync, mkdirSync, unlinkSync } from 'fs';
+import { dirname } from 'path';
 import * as bcrypt from 'bcryptjs';
 import { AppModule } from '../src/app.module';
 import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter';
@@ -19,6 +20,7 @@ import { User } from '../src/modules/users/entities/user.entity';
 const TEST_DB_PATH = './data/e2e-test.sqlite';
 
 function cleanupTestDb() {
+  mkdirSync(dirname(TEST_DB_PATH), { recursive: true });
   if (existsSync(TEST_DB_PATH)) unlinkSync(TEST_DB_PATH);
 }
 
