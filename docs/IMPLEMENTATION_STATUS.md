@@ -109,6 +109,19 @@
     git) → `ENOENT` à l'écriture de la base sql.js des tests e2e — corrigé
     avec un `.gitkeep` et un `mkdirSync` récursif défensif dans le setup des
     tests.
+  - **Bug latent découvert via un vrai déploiement Render** (`docker build`
+    seul ne l'aurait jamais révélé) : sur un build sans cache incrémental
+    TypeScript, `test/app.e2e-spec.ts` était inclus dans la compilation
+    `nest build` (aucun `include` dans `tsconfig.json`), ce qui décalait la
+    racine calculée par TypeScript et produisait `dist/src/main.js` au lieu
+    de `dist/main.js` — le conteneur crashait donc au démarrage
+    (`MODULE_NOT_FOUND`). En local, un `.tsbuildinfo` incrémental ancien
+    masquait le problème ; en CI, `docker build` valide seulement que
+    l'image se construit, jamais qu'elle démarre. Corrigé avec
+    `"include": ["src/**/*"]` dans `backend/tsconfig.json` (build toujours à
+    plat, peu importe le cache) + un vrai smoke test ajouté au job
+    `docker-build` du CI (`docker run` + attente de `/api/v1/health`) pour
+    que ce genre de régression ne repasse plus inaperçu.
 
 **Frontend**
 
