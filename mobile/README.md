@@ -1,9 +1,10 @@
 # Tour d'Avant-Garde — Mobile (squelette)
 
-**Statut : squelette de démarrage, non testé.** Cet environnement n'a ni Expo
-CLI, ni simulateur, ni appareil physique connecté — ce code n'a donc pas pu
-être exécuté ni vérifié. C'est un point de départ pour le Sprint "Application
-mobile", pas une app terminée.
+**Statut : squelette avec 19 tests (logique + rendu), jamais lancé sur un
+appareil.** Cet environnement n'a ni Expo CLI, ni simulateur, ni appareil
+physique connecté — l'app n'a donc jamais pu être vue tourner réellement.
+C'est un point de départ solide pour le Sprint "Application mobile", pas une
+app terminée.
 
 ## Contenu
 
@@ -43,16 +44,31 @@ npm install
 npm test
 ```
 
-11 tests unitaires (Jest + ts-jest) sur `src/api.ts` — connexion, validité et
-expiration du token JWT, repli sur le cache hors-ligne, distinction 403
-(RBAC) vs backend injoignable. Tourne sans Expo ni simulateur (mock de
-`fetch` et `@react-native-async-storage/async-storage`) ; ne couvre donc que
-la logique du client API, pas le rendu des écrans.
+**19 tests** (Jest, preset `jest-expo`), en deux couches :
+
+- **11 tests de logique** (`src/api.test.ts`) — connexion, validité et
+  expiration du token JWT, repli sur le cache hors-ligne, distinction 403
+  (RBAC) vs backend injoignable. `fetch` et `AsyncStorage` mockés.
+- **8 tests de rendu de composants** (`@testing-library/react-native`),
+  `../api` entièrement mocké :
+  - `LoginScreen` — validation locale, appel de `login()`, message d'erreur
+    serveur affiché.
+  - `DashboardScreen` — statistiques affichées une fois chargées, bannière
+    hors-ligne, déconnexion.
+  - `PrayerRequestsScreen` — **contrôle de rôle dans l'UI** : un membre ne
+    peut pas ouvrir le sélecteur de statut, un responsable peut l'ouvrir et
+    changer le statut d'une requête.
+
+Tourne sans Expo CLI ni simulateur/appareil — `jest-expo` fournit
+l'environnement de test (mocks natifs RN) sans lancer de vraie app.
 
 ## Ce qui manque pour une vraie app
 
 - Notifications push, mode hors-ligne plus poussé si besoin (le cache actuel
   ne couvre que les listes déjà consultées).
-- Tests de composants (rendu des écrans, navigation) avec
-  `jest-expo`/`@testing-library/react-native`.
+- Tests de composants pour `MeetingsScreen` et `NotificationsScreen` (même
+  infra déjà en place, juste pas encore écrits).
 - Build EAS et publication sur les stores.
+- Faire tourner l'app pour de vrai (Expo Go / simulateur / build) — jamais
+  fait dans aucun environnement jusqu'ici, seule la logique et le rendu
+  isolé des composants ont pu être vérifiés.

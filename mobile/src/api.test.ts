@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchNotifications, fetchPrayerRequests, getValidToken, login, wasLastFetchFromCache } from './api';
 
 function fakeJwt(payload: Record<string, unknown>) {
   const encode = (obj: unknown) => Buffer.from(JSON.stringify(obj)).toString('base64url');
@@ -21,7 +22,6 @@ describe('mobile api client', () => {
 
   describe('login()', () => {
     it('stores the token and user on success', async () => {
-      const { login } = await import('./api');
       mockFetchOnce(201, { accessToken: 'tok123', user: { id: 'u1', fullName: 'Jean', email: 'j@x.org', role: 'RESPONSABLE' } });
 
       const result = await login('j@x.org', 'secret');
@@ -32,7 +32,6 @@ describe('mobile api client', () => {
     });
 
     it('throws the server message on failure', async () => {
-      const { login } = await import('./api');
       mockFetchOnce(401, { message: 'Identifiants invalides' });
 
       await expect(login('j@x.org', 'wrong')).rejects.toThrow('Identifiants invalides');
@@ -42,12 +41,10 @@ describe('mobile api client', () => {
 
   describe('getValidToken()', () => {
     it('returns null when no token is stored', async () => {
-      const { getValidToken } = await import('./api');
       expect(await getValidToken()).toBeNull();
     });
 
     it('returns the token when it is not expired', async () => {
-      const { getValidToken } = await import('./api');
       const token = fakeJwt({ exp: Math.floor(Date.now() / 1000) + 3600 });
       await AsyncStorage.setItem('tag_token', token);
 
@@ -55,7 +52,6 @@ describe('mobile api client', () => {
     });
 
     it('clears storage and returns null when the token is expired', async () => {
-      const { getValidToken } = await import('./api');
       const token = fakeJwt({ exp: Math.floor(Date.now() / 1000) - 60 });
       await AsyncStorage.setItem('tag_token', token);
       await AsyncStorage.setItem('tag_user', JSON.stringify({ id: 'u1' }));
@@ -66,7 +62,6 @@ describe('mobile api client', () => {
     });
 
     it('clears storage and returns null for a malformed token', async () => {
-      const { getValidToken } = await import('./api');
       await AsyncStorage.setItem('tag_token', 'not-a-jwt');
 
       expect(await getValidToken()).toBeNull();
@@ -76,7 +71,6 @@ describe('mobile api client', () => {
 
   describe('fetchPrayerRequests() — cache fallback', () => {
     it('caches the live response on success', async () => {
-      const { fetchPrayerRequests, wasLastFetchFromCache } = await import('./api');
       mockFetchOnce(200, [{ id: 'r1' }]);
 
       const data = await fetchPrayerRequests();
@@ -87,7 +81,6 @@ describe('mobile api client', () => {
     });
 
     it('falls back to the cache when the backend is unreachable', async () => {
-      const { fetchPrayerRequests, wasLastFetchFromCache } = await import('./api');
       await AsyncStorage.setItem('tag_cache_prayer_requests', JSON.stringify([{ id: 'cached' }]));
       (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('network down'));
 
@@ -98,7 +91,6 @@ describe('mobile api client', () => {
     });
 
     it('throws when the backend is unreachable and there is no cache', async () => {
-      const { fetchPrayerRequests } = await import('./api');
       (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('network down'));
 
       await expect(fetchPrayerRequests()).rejects.toThrow('offline');
@@ -107,7 +99,6 @@ describe('mobile api client', () => {
 
   describe('fetchNotifications() — RBAC vs offline', () => {
     it('surfaces a forbidden error without falling back to cache', async () => {
-      const { fetchNotifications } = await import('./api');
       await AsyncStorage.setItem('tag_cache_notifications', JSON.stringify([{ id: 'cached' }]));
       mockFetchOnce(403, { message: 'Forbidden' });
 
@@ -115,7 +106,6 @@ describe('mobile api client', () => {
     });
 
     it('falls back to cache on a generic failure', async () => {
-      const { fetchNotifications } = await import('./api');
       await AsyncStorage.setItem('tag_cache_notifications', JSON.stringify([{ id: 'cached' }]));
       (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('network down'));
 

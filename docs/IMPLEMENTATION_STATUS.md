@@ -143,10 +143,15 @@
   message "accès limité" sur les notifications pour un rôle non autorisé),
   cache hors-ligne (`AsyncStorage`) avec bannière "backend hors ligne" et
   reprise sur les données mises en cache.
-- **11 tests unitaires** (`cd mobile && npm test`, Jest + ts-jest, sans Expo ni
-  simulateur — uniquement `src/api.ts` avec `fetch`/`AsyncStorage` mockés) :
-  connexion (succès/échec), validité et expiration du token JWT, repli sur le
-  cache hors-ligne, distinction 403 (RBAC) vs backend injoignable.
+- **19 tests** (`cd mobile && npm test`, Jest avec le preset `jest-expo`, sans
+  Expo CLI ni simulateur/appareil) : 11 tests de logique sur `src/api.ts`
+  (connexion, validité/expiration JWT, repli sur cache hors-ligne, 403 RBAC
+  vs backend injoignable) + 8 tests de rendu de composants
+  (`@testing-library/react-native`, `../api` mocké) sur `LoginScreen`,
+  `DashboardScreen` et `PrayerRequestsScreen` — ces derniers vérifient
+  notamment le **contrôle de rôle dans l'UI** (un membre ne voit pas le
+  sélecteur de statut, un responsable peut changer le statut d'une requête).
+  Intégré au CI (nouveau job `mobile` dans `.github/workflows/ci.yml`).
 
 ### Reste bloqué sur un élément externe
 
@@ -160,12 +165,13 @@
 - Vraie file de tâches distribuée (BullMQ + Redis) si le volume de rappels ou
   un déploiement multi-instance l'exige — la solution actuelle
   (`@nestjs/schedule`, in-process) suffit pour une seule instance.
-- App mobile : notifications push, tests de composants (rendu, navigation —
-  nécessitent `jest-expo`/`@testing-library/react-native`, pas seulement la
-  logique de `src/api.ts` déjà couverte), build EAS et publication sur les
-  stores. Reste bloqué sur un élément externe (pas d'Expo CLI, simulateur ou
-  appareil dans cet environnement) : impossible de lancer l'app pour la voir
-  tourner réellement, seule la logique pure a pu être vérifiée.
+- App mobile : notifications push, tests de composants pour `MeetingsScreen`
+  et `NotificationsScreen` (même infra `jest-expo` déjà en place pour les 3
+  autres écrans), build EAS et publication sur les stores. Reste bloqué sur
+  un élément externe (pas d'Expo CLI, simulateur ou appareil dans cet
+  environnement) : impossible de lancer l'app pour la voir tourner
+  réellement, seuls la logique et le rendu isolé des composants ont pu être
+  vérifiés.
 - Déploiement effectif : les images Docker se construisent avec succès en CI
   (voir plus haut), mais aucun déploiement réel (registre d'images, hébergeur,
   domaine) n'a été fait. Vraie instance PostgreSQL à connecter (le code est

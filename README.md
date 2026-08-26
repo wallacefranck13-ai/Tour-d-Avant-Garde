@@ -28,7 +28,7 @@ Plus deux fonctionnalités ajoutées dès ce sprint :
 tag-tour-de-garde/
 ├── backend/     API NestJS + TypeORM (sql.js en développement)
 ├── frontend/    Tableau de bord (HTML/CSS/JS autonome, aucun build requis)
-├── mobile/      Squelette Expo/React Native (non testé, voir mobile/README.md)
+├── mobile/      Squelette Expo/React Native (19 tests, jamais lancé sur appareil — voir mobile/README.md)
 ├── docs/        État d'implémentation
 ├── docker-compose.yml
 └── .github/workflows/ci.yml
@@ -109,7 +109,7 @@ d'e-mails. Les tests e2e (Supertest) vérifient le câblage réel bout-en-bout
 sur une base sql.js dédiée et jetable : santé, forme d'erreur uniforme,
 login, validation, parcours WhatsApp → requête de prière, RBAC.
 
-### Docker (non testé dans cet environnement — pas de Docker disponible ici)
+### Docker (non testé en local ici — pas de Docker disponible — mais validé en CI, voir badge ci-dessus)
 
 ```bash
 docker compose up --build
@@ -196,8 +196,10 @@ Application Expo/React Native dans `mobile/` — navigation par onglets
 requêtes, création de réunions pour les responsables, contrôle de rôle, alertes
 d'erreur, cache hors ligne et vérification de session JWT. Elle réutilise les
 mêmes endpoints que le web.
-**Non exécutée** dans cet environnement (pas d'Expo CLI/simulateur disponible)
-— voir `mobile/README.md` pour le détail et la suite.
+19 tests (logique + rendu de composants, `jest-expo`), intégrés au CI.
+**Jamais lancée sur simulateur/appareil** dans cet environnement (pas d'Expo
+CLI/simulateur disponible) — voir `mobile/README.md` pour le détail et la
+suite.
 
 ## Configuration
 
@@ -231,11 +233,16 @@ Bloqué sur un élément externe que je n'ai pas dans cet environnement :
 - **WhatsApp Cloud API réelle** — l'envoi via Graph API est déjà codé dans
   `WhatsappApiService`, il manque un compte Meta Business
   (`WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN`).
+- Application mobile lancée sur simulateur/appareil réel — pas d'Expo
+  CLI/simulateur ici (la logique et le rendu des composants sont testés,
+  voir `mobile/README.md`).
 
 Pas de blocage, juste pas encore fait :
 
 - Redis/BullMQ (la version actuelle des rappels utilise `@nestjs/schedule`
   in-process, suffisant pour une seule instance).
-- Application mobile : notifications push, mode hors-ligne, tests, publication
-  sur les stores.
-- Déploiement effectif (Docker/CI écrits mais jamais exécutés ici).
+- Application mobile : notifications push, build EAS, publication sur les
+  stores.
+- Déploiement effectif : les images Docker se construisent avec succès en CI
+  (voir badge), mais rien n'est réellement déployé (registre, hébergeur,
+  domaine, Postgres de prod).
