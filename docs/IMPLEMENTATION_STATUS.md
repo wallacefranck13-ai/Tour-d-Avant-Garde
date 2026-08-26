@@ -78,11 +78,11 @@
   à 4 étapes, requêtes de démonstration, prochaine rencontre, intention
   mondiale, Flambeau du jour, campagnes de démonstration. Utilise le même
   helper de configuration DB que l'application (pas de divergence possible).
-- **32 tests unitaires** (`npm test`, Jest) couvrant `AuthService`, `RolesGuard`,
+- **34 tests unitaires** (`npm test`, Jest) couvrant `AuthService`, `RolesGuard`,
   `VeilleurService`, `WhatsappService` (routage du menu conversationnel),
-  `PrayerRequestsService`, `getDatabaseConnectionOptions` (sqljs/postgres) et
-  `EmailService`.
-- **8 tests d'intégration end-to-end** (`npm run test:e2e`, Jest + Supertest) :
+  `PrayerRequestsService` (dont pagination), `getDatabaseConnectionOptions`
+  (sqljs/postgres) et `EmailService`.
+- **10 tests d'intégration end-to-end** (`npm run test:e2e`, Jest + Supertest) :
   vraie application NestJS, vraies requêtes HTTP, base sql.js dédiée et
   jetable (isolée du fichier de développement, nettoyée après coup). Vérifie
   le câblage réel bout-en-bout : santé + statut DB, forme d'erreur 404
