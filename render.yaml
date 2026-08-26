@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: tag-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: DB_DRIVER
+        value: sqljs
+      - key: WHATSAPP_VERIFY_TOKEN
+        generateValue: true
+
+  - type: web
+    name: tag-frontend
+    runtime: static
+    rootDir: frontend
+    staticPublishPath: .
+    buildCommand: sed -i "s#http://localhost:3050/api/v1#https://$BACKEND_HOST/api/v1#" config.js
+    envVars:
+      - key: BACKEND_HOST
+        fromService:
+          name: tag-backend
+          type: web
+          property: host

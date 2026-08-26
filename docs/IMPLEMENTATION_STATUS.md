@@ -174,8 +174,11 @@
   appareil dans cet environnement) : impossible de lancer l'app pour la voir
   tourner réellement, seuls la logique et le rendu isolé des composants ont
   pu être vérifiés (les 5 écrans sont maintenant couverts).
-- Déploiement effectif : les images Docker se construisent avec succès en CI
-  (voir plus haut), mais aucun déploiement réel (registre d'images, hébergeur,
-  domaine) n'a été fait. Vraie instance PostgreSQL à connecter (le code est
-  prêt, voir `.env.example`) — toujours sur sql.js en développement, Docker
+- Déploiement effectif : `render.yaml` (Blueprint Render, backend Docker +
+  frontend statique, `JWT_SECRET`/`WHATSAPP_VERIFY_TOKEN` auto-générés,
+  `config.js` du frontend réécrit au build avec l'URL réelle du backend) est
+  prêt et poussé, mais **jamais appliqué** — nécessite un compte Render créé
+  par l'utilisateur (accès externe indisponible ici). Vraie instance
+  PostgreSQL à connecter (le code est prêt, voir `.env.example`) — toujours
+  sur sql.js en développement, Docker
   toujours indisponible en local dans cet environnement.

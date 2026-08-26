@@ -118,6 +118,21 @@ docker compose up --build
 Lance le backend (port 3050) et le frontend (port 4300). Un service PostgreSQL
 est prêt dans `docker-compose.yml`, commenté en attendant d'être branché.
 
+## Déploiement (Render)
+
+Un `render.yaml` à la racine décrit un déploiement Blueprint en deux services
+(`tag-backend` en Docker, `tag-frontend` en site statique — son `config.js`
+est réécrit au build pour pointer vers l'URL réelle du backend). Sur
+[render.com](https://render.com) : New → Blueprint → sélectionner ce dépôt →
+Apply. Aucune configuration manuelle nécessaire (JWT_SECRET et
+WHATSAPP_VERIFY_TOKEN sont générés automatiquement).
+
+**Limites du plan gratuit Render** : le service backend se met en veille après
+15 min d'inactivité (premier appel après veille : ~50s) et son stockage est
+éphémère — la base sql.js est réinitialisée à chaque redéploiement ou reprise
+après veille (le conteneur relance le seed automatiquement, donc les
+identifiants de démo ci-dessus fonctionnent toujours après un redémarrage).
+
 ## Lancer l'interface
 
 Ouvrir `frontend/index.html` dans un navigateur (ou le servir avec `node
