@@ -90,11 +90,25 @@
   WhatsApp → création de requête → visible en base, RBAC (401 sans token, 200
   avec token responsable). Tous verts.
 - **Docker** : `Dockerfile` (backend + frontend), `docker-compose.yml` à la
-  racine (service Postgres prêt mais commenté, bascule via `DB_DRIVER`). Non
-  testé dans cet environnement (Docker non installé ici).
+  racine (service Postgres prêt mais commenté, bascule via `DB_DRIVER`).
+  Toujours non testé en local (Docker non installé dans cet environnement),
+  mais **les deux images se construisent avec succès sur le runner CI**
+  (`docker build` réel, voir ci-dessous) — première validation en conditions
+  réelles.
 - **CI** : `.github/workflows/ci.yml` (build + tests unitaires + tests e2e
-  backend, build des images Docker). Non exécuté (le dossier n'est pas encore
-  un dépôt Git connecté).
+  backend, build des images Docker). Le dépôt est maintenant sur GitHub
+  (`wallacefranck13-ai/tag-tour-de-garde`, privé) et **le pipeline tourne et
+  passe au vert** sur chaque push vers `main`. Deux bugs réels révélés par le
+  tout premier run (jamais visibles en local, Windows) et corrigés :
+  - TypeORM échouait à charger `sql.js` sur le runner Linux
+    (`this.sqlite is not a function`) — corrigé en passant
+    `driver: require('sql.js')` explicitement dans
+    `database.config.ts` plutôt que de compter sur le chargement interne de
+    TypeORM.
+  - `backend/data/` n'existe pas sur un clone frais (entièrement ignoré par
+    git) → `ENOENT` à l'écriture de la base sql.js des tests e2e — corrigé
+    avec un `.gitkeep` et un `mkdirSync` récursif défensif dans le setup des
+    tests.
 
 **Frontend**
 
@@ -152,6 +166,8 @@
   stores. Reste bloqué sur un élément externe (pas d'Expo CLI, simulateur ou
   appareil dans cet environnement) : impossible de lancer l'app pour la voir
   tourner réellement, seule la logique pure a pu être vérifiée.
-- Déploiement effectif (le Docker/CI est écrit mais jamais exécuté ici, pas de
-  Docker disponible dans cet environnement) et vraie instance PostgreSQL à
-  connecter (le code est prêt, voir `.env.example`).
+- Déploiement effectif : les images Docker se construisent avec succès en CI
+  (voir plus haut), mais aucun déploiement réel (registre d'images, hébergeur,
+  domaine) n'a été fait. Vraie instance PostgreSQL à connecter (le code est
+  prêt, voir `.env.example`) — toujours sur sql.js en développement, Docker
+  toujours indisponible en local dans cet environnement.

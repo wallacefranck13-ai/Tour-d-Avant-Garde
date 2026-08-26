@@ -1,5 +1,7 @@
 # Tour d'Avant-Garde (TAG)
 
+[![CI](https://github.com/wallacefranck13-ai/tag-tour-de-garde/actions/workflows/ci.yml/badge.svg)](https://github.com/wallacefranck13-ai/tag-tour-de-garde/actions/workflows/ci.yml)
+
 Plateforme de prière, d'intercession et de suivi communautaire — pilotée par WhatsApp
 et assistée par **Le Veilleur**, l'IA d'accueil de la Tour.
 
