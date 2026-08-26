@@ -143,15 +143,19 @@
   message "accès limité" sur les notifications pour un rôle non autorisé),
   cache hors-ligne (`AsyncStorage`) avec bannière "backend hors ligne" et
   reprise sur les données mises en cache.
-- **19 tests** (`cd mobile && npm test`, Jest avec le preset `jest-expo`, sans
+- **26 tests** (`cd mobile && npm test`, Jest avec le preset `jest-expo`, sans
   Expo CLI ni simulateur/appareil) : 11 tests de logique sur `src/api.ts`
   (connexion, validité/expiration JWT, repli sur cache hors-ligne, 403 RBAC
-  vs backend injoignable) + 8 tests de rendu de composants
-  (`@testing-library/react-native`, `../api` mocké) sur `LoginScreen`,
-  `DashboardScreen` et `PrayerRequestsScreen` — ces derniers vérifient
-  notamment le **contrôle de rôle dans l'UI** (un membre ne voit pas le
-  sélecteur de statut, un responsable peut changer le statut d'une requête).
-  Intégré au CI (nouveau job `mobile` dans `.github/workflows/ci.yml`).
+  vs backend injoignable) + 15 tests de rendu de composants
+  (`@testing-library/react-native`, `../api` mocké) couvrant les 5 écrans
+  (`LoginScreen`, `DashboardScreen`, `PrayerRequestsScreen`, `MeetingsScreen`,
+  `NotificationsScreen`) — vérifient notamment le **contrôle de rôle dans
+  l'UI** (un membre ne voit pas le sélecteur de statut ni le bouton de
+  création de réunion, un responsable peut changer le statut d'une requête et
+  créer une réunion) et la distinction RBAC (403) vs backend injoignable côté
+  UI. Intégré au CI (job `mobile` dans `.github/workflows/ci.yml`) — stable
+  sur plusieurs relances consécutives après correction d'un flake initial
+  (fake timers globaux incompatibles avec `FlatList` sous charge CI).
 
 ### Reste bloqué sur un élément externe
 
@@ -165,13 +169,11 @@
 - Vraie file de tâches distribuée (BullMQ + Redis) si le volume de rappels ou
   un déploiement multi-instance l'exige — la solution actuelle
   (`@nestjs/schedule`, in-process) suffit pour une seule instance.
-- App mobile : notifications push, tests de composants pour `MeetingsScreen`
-  et `NotificationsScreen` (même infra `jest-expo` déjà en place pour les 3
-  autres écrans), build EAS et publication sur les stores. Reste bloqué sur
-  un élément externe (pas d'Expo CLI, simulateur ou appareil dans cet
-  environnement) : impossible de lancer l'app pour la voir tourner
-  réellement, seuls la logique et le rendu isolé des composants ont pu être
-  vérifiés.
+- App mobile : notifications push, build EAS et publication sur les stores.
+  Reste bloqué sur un élément externe (pas d'Expo CLI, simulateur ou
+  appareil dans cet environnement) : impossible de lancer l'app pour la voir
+  tourner réellement, seuls la logique et le rendu isolé des composants ont
+  pu être vérifiés (les 5 écrans sont maintenant couverts).
 - Déploiement effectif : les images Docker se construisent avec succès en CI
   (voir plus haut), mais aucun déploiement réel (registre d'images, hébergeur,
   domaine) n'a été fait. Vraie instance PostgreSQL à connecter (le code est

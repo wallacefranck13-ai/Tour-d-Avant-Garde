@@ -1,6 +1,6 @@
 # Tour d'Avant-Garde — Mobile (squelette)
 
-**Statut : squelette avec 19 tests (logique + rendu), jamais lancé sur un
+**Statut : squelette avec 26 tests (logique + rendu), jamais lancé sur un
 appareil.** Cet environnement n'a ni Expo CLI, ni simulateur, ni appareil
 physique connecté — l'app n'a donc jamais pu être vue tourner réellement.
 C'est un point de départ solide pour le Sprint "Application mobile", pas une
@@ -44,13 +44,13 @@ npm install
 npm test
 ```
 
-**19 tests** (Jest, preset `jest-expo`), en deux couches :
+**26 tests** (Jest, preset `jest-expo`), en deux couches :
 
 - **11 tests de logique** (`src/api.test.ts`) — connexion, validité et
   expiration du token JWT, repli sur le cache hors-ligne, distinction 403
   (RBAC) vs backend injoignable. `fetch` et `AsyncStorage` mockés.
-- **8 tests de rendu de composants** (`@testing-library/react-native`),
-  `../api` entièrement mocké :
+- **15 tests de rendu de composants** (`@testing-library/react-native`),
+  `../api` entièrement mocké, les 5 écrans couverts :
   - `LoginScreen` — validation locale, appel de `login()`, message d'erreur
     serveur affiché.
   - `DashboardScreen` — statistiques affichées une fois chargées, bannière
@@ -58,16 +58,19 @@ npm test
   - `PrayerRequestsScreen` — **contrôle de rôle dans l'UI** : un membre ne
     peut pas ouvrir le sélecteur de statut, un responsable peut l'ouvrir et
     changer le statut d'une requête.
+  - `MeetingsScreen` — liste affichée, bouton de création masqué/visible
+    selon le rôle, validation du formulaire, création réussie.
+  - `NotificationsScreen` — liste affichée, message d'accès limité sur 403
+    (RBAC), bannière de repli sur le cache en cas d'échec générique.
 
 Tourne sans Expo CLI ni simulateur/appareil — `jest-expo` fournit
-l'environnement de test (mocks natifs RN) sans lancer de vraie app.
+l'environnement de test (mocks natifs RN) sans lancer de vraie app. Vérifié
+stable sur plusieurs dizaines d'exécutions consécutives.
 
 ## Ce qui manque pour une vraie app
 
 - Notifications push, mode hors-ligne plus poussé si besoin (le cache actuel
   ne couvre que les listes déjà consultées).
-- Tests de composants pour `MeetingsScreen` et `NotificationsScreen` (même
-  infra déjà en place, juste pas encore écrits).
 - Build EAS et publication sur les stores.
 - Faire tourner l'app pour de vrai (Expo Go / simulateur / build) — jamais
   fait dans aucun environnement jusqu'ici, seule la logique et le rendu

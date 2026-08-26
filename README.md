@@ -28,7 +28,7 @@ Plus deux fonctionnalités ajoutées dès ce sprint :
 tag-tour-de-garde/
 ├── backend/     API NestJS + TypeORM (sql.js en développement)
 ├── frontend/    Tableau de bord (HTML/CSS/JS autonome, aucun build requis)
-├── mobile/      Squelette Expo/React Native (19 tests, jamais lancé sur appareil — voir mobile/README.md)
+├── mobile/      Squelette Expo/React Native (26 tests, jamais lancé sur appareil — voir mobile/README.md)
 ├── docs/        État d'implémentation
 ├── docker-compose.yml
 └── .github/workflows/ci.yml
@@ -196,7 +196,7 @@ Application Expo/React Native dans `mobile/` — navigation par onglets
 requêtes, création de réunions pour les responsables, contrôle de rôle, alertes
 d'erreur, cache hors ligne et vérification de session JWT. Elle réutilise les
 mêmes endpoints que le web.
-19 tests (logique + rendu de composants, `jest-expo`), intégrés au CI.
+26 tests (logique + rendu de composants sur les 5 écrans, `jest-expo`), intégrés au CI.
 **Jamais lancée sur simulateur/appareil** dans cet environnement (pas d'Expo
 CLI/simulateur disponible) — voir `mobile/README.md` pour le détail et la
 suite.
