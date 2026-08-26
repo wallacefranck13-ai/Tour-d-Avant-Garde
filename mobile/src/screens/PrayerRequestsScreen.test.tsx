@@ -11,6 +11,10 @@ const mockedWasCache = wasLastFetchFromCache as jest.MockedFunction<typeof wasLa
 
 const REQUESTS = [{ id: 'r1', authorName: 'Jean B.', subject: 'Guérison', status: 'NEW', isUrgent: false }];
 
+// FlatList + deux effets asynchrones enchaînés (getCurrentUser + load) peuvent
+// être lents sur un runner CI chargé ; marge au-delà du défaut de 5000 ms.
+jest.setTimeout(15000);
+
 describe('PrayerRequestsScreen — contrôle de rôle', () => {
   beforeEach(() => {
     mockedFetch.mockReset().mockResolvedValue(REQUESTS);

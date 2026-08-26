@@ -4,6 +4,11 @@ import DashboardScreen from './DashboardScreen';
 import { fetchDashboardOverview, logout, wasLastFetchFromCache } from '../api';
 
 jest.mock('../api');
+
+// ScrollView + effet asynchrone peuvent être lents sur un runner CI chargé ;
+// marge au-delà du défaut de 5000 ms.
+jest.setTimeout(15000);
+
 const mockedFetch = fetchDashboardOverview as jest.MockedFunction<typeof fetchDashboardOverview>;
 const mockedLogout = logout as jest.MockedFunction<typeof logout>;
 const mockedWasCache = wasLastFetchFromCache as jest.MockedFunction<typeof wasLastFetchFromCache>;
